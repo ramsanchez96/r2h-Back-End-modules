@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>EASY AJAX</title>
+</head>
+<body>
+    <h1>People in Space:</h1>
+    <ul id="output"></ul>
+    
+    
+    <script>
+        let output = document.getElementById('output');
+
+        fetch('http://api.open-notify.org/astros.json')
+        .then(response => response.json())
+        .then(data => spacePeople(data))
+        
+        function spacePeople(data) {
+            output.innerHTML= '';
+            for(var i = 0; i < data.people.length; i++){
+                output.innerHTML+= `
+                <li>${data.people[i].name} is on the ${data.people[i].craft}</li>
+                `;
+            }   
+        }
+
+    </script>
+</body>
+</html>

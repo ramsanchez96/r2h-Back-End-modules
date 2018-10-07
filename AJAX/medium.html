@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>MEDIUM AJAX</title>
+</head>
+
+<body>
+    <h1>Please Enter a City to check weather conditons:</h1>
+    <form id="myForm">
+        <input type="text" name="city" id="input" />
+        <button>Submit</button>
+    </form>
+    
+    <div id="output"></div>
+
+    <script>
+
+        let output = document.getElementById('output');
+        let myForm = document.getElementById('myForm');
+
+        myForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            run();
+        });
+
+        function run() {
+            let input = document.getElementById('input').value;
+
+            fetch(`http://api.openweathermap.org/data/2.5/weather?q=${input},us&units=imperial&appid=723cf4bd1abe3a0ea6142bf37d58bd3e`)
+                .then(response => response.json())
+                .then(data => weatherTracker(data))
+
+            function weatherTracker(data) {
+                if (data.cod !== 200) {
+                    output.innerHTML = `Please enter a correct city name`;
+                }
+
+                let tempMin = Math.floor(data.main.temp_min);
+                let tempMax = Math.ceil(data.main.temp_max);
+
+
+                output.innerHTML = `
+            <p>The temperature in ${data.name} today will be between ${tempMin}°F and ${tempMax}°F.</p>
+            <p>The weather conditon will be: ${data.weather[0].main}</p>
+            `;
+            }
+        }
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>HARD AJAX</title>
+</head>
+<body>
+    <form id="myForm">
+        <label>Latitude:<input type="text" name="lon" id="lat" /></label>
+        <label>Longtitude:<input type="text" name="long" id="long" /></label>
+        <button>Submit</button>
+    </form>
+    <button onClick="getLocation()">Use my current location</button>
+    <div id="output"></div>
+    
+    <script>
+        let myForm = document.getElementById("myForm");
+        let output = document.getElementById("output");
+
+        myForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            run();
+        });
+
+        function getLocation() {
+           if (navigator.geolocation) {
+               navigator.geolocation.getCurrentPosition(setPosition);
+           } else {
+               output.innerHTML = "Geolocation is not supported by this browser.";
+           }
+       }
+
+       function setPosition(position) {
+           lat.value = position.coords.latitude;
+           long.value = position.coords.longitude;
+           run();
+       }
+
+        function run(){
+            let long = document.getElementById("long").value;
+            let lat = document.getElementById("lat").value;
+
+            fetch(`http://api.open-notify.org/iss-pass.json?lat=${lat}&lon=${long}`)
+            .then(response => response.json())
+            .then(data => ISSTracker(data))
+
+            function ISSTracker(data) {
+                if (data.message !== 'success') {
+                    output.innerHTML = `Please enter a correct Latitude and Longitude`;
+                    return
+                }
+
+                output.innerHTML += `
+                <h1>In the next 24 hours the ISS will pass over ${data.request.passes} time(s)</h1>
+                <h2>It will pass at these times:</h2>
+                `;
+                
+                for(var i = 0; i < data.response.length; i++){
+                    let date = new Date(data.response[i].risetime * 1000);
+                    output.innerHTML += `<p>At ${date} for ${data.response[i].duration} seconds</p><br/>`
+                }
+
+            }
+        }
+        
+        
+    </script>
+
+</body>
+</html>
